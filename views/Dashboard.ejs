@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Home Page</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            background-color: #e9ebee;
+        }
+
+        .header {
+            background-color: #003366;
+            color: white;
+            padding: 10px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo img {
+            height: 50px;
+        }
+
+        .company-name {
+            margin: 0;
+            color: white;
+            font-size: 24px;
+            margin-left: 15px;
+        }
+
+        .logout-button {
+            background-color: white;
+            color: black;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-left: -30px;
+        }
+
+        .container {
+            display: flex;
+            flex: 1;
+        }
+
+        .sidebar {
+            background-color: white;
+            width: 250px;
+            padding: 20px;
+            height: calc(100vh - 60px);
+            /* Adjust for header height */
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-info {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .user-info .avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+            object-fit: cover;
+        }
+
+        .user-info .user-name,
+        .user-info .user-id {
+            margin: 5px 0;
+        }
+
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        nav ul li {
+            background-color: white;
+            color: #003366;
+            padding: 15px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            text-align: center;
+            border: 1px solid #ddd;
+            /* Add border to each button */
+            margin-bottom: 1px;
+            /* Space between buttons */
+            transition: background-color 0.3s ease;
+            position: relative;
+        }
+
+        nav ul li:hover {
+            background-color: #f2f2f2;
+            /* Change background to grey on hover */
+            color: #003366;
+            /* Keep the text color the same */
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            width: 250px;
+            left: 0;
+            top: 100%;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .dropdown-content li {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .dropdown-content li:hover {
+            background-color: #f2f2f2;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .main-content {
+            flex: 1;
+            background-color: #f2f2f2;
+            padding: 40px;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            /* 3 equal columns */
+            grid-gap: 30px;
+            /* Equal spacing between rows and columns */
+        }
+
+        .content-item {
+            text-align: center;
+        }
+
+        .circle-icon {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin: 0 auto 10px;
+        }
+
+        .circle-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .nav-button {
+            background-color: #00509e;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            /* Ensures buttons are equal width */
+        }
+
+        .nav-button:hover {
+            background-color: #003366;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .profile-link {
+            display: block;
+            margin-top: 10px;
+            color: #00509e;
+            text-decoration: none;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .profile-link:hover {
+            text-decoration: underline;
+            color: #003366;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            /* Adjust top position as needed */
+            left: 20px;
+            /* Adjust left position as needed */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">
+                <img src="Images/CompanyLogo.jpg" alt="Company Logo">
+            </div>
+            <h1 class="company-name">COMPANY NAME</h1>
+        </div>
+        <button class="logout-button" onclick="navigateTo('/logout')">LOG OUT</button>
+    </div>
+
+    <div class="container">
+        <div class="sidebar">
+            <div class="user-info">
+                <img src="Images\\ProfilePicture.jpg" alt="Profile Photo" class="avatar">
+                <p class="user-name">PERSON NAME</p>
+                <p class="user-id">PERSON ID</p>
+                <a href="/profile" class="profile-link">Profile</a>
+            </div>
+            <nav>
+                <ul>
+                    <li onclick="navigateTo('/Dashboard')">HOME</li>
+                    <li class="dropdown">
+                        <span>TOOLS</span>
+                        <ul class="dropdown-content">
+                            <li onclick="navigateTo('/tools/in-service')">In Service</li>
+                            <li onclick="navigateTo('/tools/all')">All Tools</li>
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <span>EMPLOYEES</span>
+                        <ul class="dropdown-content">
+                            <li><a href="/inservice">In Service</a></li>
+                            <li><a href="/employees/all">All Employees</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <span>HELICOPTER</span>
+                        <ul class="dropdown-content">
+                            <li onclick="navigateTo('/helicopters/in-service')">In Service</li>
+                            <li onclick="navigateTo('/helicopters/all')">All</li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="main-content">
+            <!-- Home Page Section -->
+            <div id="home" class="section active">
+                <div class="content-grid">
+                    <!-- First Column -->
+                    <div class="content-item">
+                        <div class="circle-icon">
+                            <img src="Images/ManageTeam.jpg" alt="Manage Team">
+                        </div>
+                        <button class="nav-button" onclick="navigateTo('/manage-team')">MANAGE TEAM</button>
+                    </div>
+                    <div class="content-item">
+                        <div class="circle-icon">
+                            <img src="Images/Lend.jpg" alt="Lend">
+                        </div>
+                        <button class="nav-button" onclick="navigateTo('/lend')">LEND</button>
+                    </div>
+
+                    <!-- Second Column -->
+                    <div class="content-item">
+                        <div class="circle-icon">
+                            <img src="Images/Return.jpg" alt="Return">
+                        </div>
+                        <button class="nav-button" onclick="navigateTo('/return')">RETURN</button>
+                    </div>
+                </div>
+            </div>
+
+            
+            <!-- Additional Sections -->
+        </div>
+    </div>
+
+    <!-- jQuery and Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+    </script>
+</body>
+
+</html>

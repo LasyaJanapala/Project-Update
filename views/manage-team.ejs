@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        h1 {
+            background-color: #003366;
+            color: white;
+            padding: 20px;
+            margin: 0;
+            text-align: center;
+        }
+
+        .button-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .button-container button {
+            background-color: #28a745; /* Green color for "Assign Team" */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            width: 150px; /* Ensure consistent button width */
+        }
+
+        .button-container button:hover {
+            background-color: #218838; /* Darker green on hover */
+        }
+
+        table {
+            width: 90%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #003366;
+            color: white;
+        }
+
+        td {
+            border-bottom: 1px solid #ddd;
+        }
+
+        .actions a {
+            text-decoration: none; /* Remove underline from links */
+        }
+
+        .actions a button,
+        .actions form button {
+            background-color: #00509e; /* Default button color */
+            color: white;
+            border: none;
+            padding: 10px 20px; /* Ensure consistent padding */
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+            width: 150px; /* Ensure consistent button width */
+            display: block;
+            margin: 5px auto; /* Center buttons vertically */
+        }
+
+        .actions a button:hover,
+        .actions form button:hover {
+            background-color: #003366; /* Darker shade on hover */
+        }
+
+        .actions a button.assign-service {
+            background-color: #28a745; /* Green for "Assign Service" */
+        }
+
+        .actions a button.assign-service:hover {
+            background-color: #218838; /* Darker green on hover */
+        }
+
+        .actions form button.delete-team {
+            background-color: #dc3545; /* Red for "Delete Team" */
+        }
+
+        .actions form button.delete-team:hover {
+            background-color: #c82333; /* Darker red on hover */
+        }
+
+        .no-active-teams {
+            color: red;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1><%= title %></h1>
+    
+    <!-- Button to Navigate to Assign Team Page -->
+    <div style="text-align: left; margin: 20px 30px;">
+        <a href="/dashboard">
+            <button style="
+                background-color: #00509e;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                cursor: pointer;
+                border-radius: 15px;
+                font-size: 16px;
+                transition: background-color 0.3s ease;
+                width: 150px; /* Ensure consistent button width */
+            ">
+                HOME
+            </button>
+        </a>
+    </div>
+    <div class="button-container">
+        <a href="/assign-team">
+            <button>Assign Team</button>
+        </a>
+    </div>
+
+    <% if (hasActiveTeams) { %>
+        <style>
+            /* Center column headers */
+            table th {
+                text-align: center;
+                vertical-align: middle;
+            }
+            
+            /* Add bold black border after each row */
+            table tbody tr {
+                border-bottom: 2px solid black;
+            }
+    
+            /* Style table for better visibility */
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+    
+            table th, table td {
+                padding: 10px;
+                border: 1px solid black;
+            }
+    
+            .actions button {
+                margin: 0 5px;
+            }
+        </style>
+    
+        <table>
+            <thead>
+                <tr>
+                    <th>Frame Number</th>
+                    <th>Supervisor</th>
+                    <th>Tradesmen 1</th>
+                    <th>Tradesmen 2</th>
+                    <th>Tradesmen 3</th>
+                    <th>Service</th>
+                    <th>Service Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% 
+                let lastSupervisor = null;
+                teams.forEach((team, index) => { 
+                    // Check if we need to show the supervisor details (only for the first service of each team)
+                    const isFirstServiceForTeam = lastSupervisor !== team.SupervisorPersonNumber;
+                    lastSupervisor = team.SupervisorPersonNumber;
+                
+                    // Calculate the rowspan for team details
+                    const rowspan = teams.filter(t => t.SupervisorPersonNumber === team.SupervisorPersonNumber).length;
+                %>
+                <tr>
+                    <% if (isFirstServiceForTeam) { %>
+                        <td rowspan="<%= rowspan %>"><%= team.FrameNumber %></td>
+                        <td rowspan="<%= rowspan %>"><%= team.SupervisorName %></td>
+                        <td rowspan="<%= rowspan %>"><%= team.TradesMen1Name || 'None' %></td>
+                        <td rowspan="<%= rowspan %>"><%= team.TradesMen2Name || 'None' %></td>
+                        <td rowspan="<%= rowspan %>"><%= team.TradesMen3Name || 'None' %></td>
+                    <% } %>
+                    <td><%= team.ServiceName || 'None' %></td>
+                    <% if (team.ServiceName) { %>
+                        <td><%= team.ServiceStatus ? 'Completed' : 'Pending' %></td>
+                    <% } else { %>
+                        <td>None</td>
+                    <% } %>
+                    <% if (isFirstServiceForTeam) { %>
+                        <td rowspan="<%= rowspan %>" class="actions">
+                            <a href="/assign-service/<%= team.SupervisorPersonNumber %>">
+                                <button class="assign-service">Assign Service</button>
+                            </a>
+                            <a href="/edit-team/<%= team.SupervisorPersonNumber %>">
+                                <button>Edit Team</button>
+                            </a>
+                            <a href="/lend-tools?frameNumber=<%= team.FrameNumber %>&supervisor=<%= team.SupervisorPersonNumber %>">
+                                <button>Lend Tools</button>
+                            </a>
+                            <a href="/return-tools?frameNumber=<%= team.FrameNumber %>&supervisor=<%= team.SupervisorPersonNumber %>">
+                                <button>Return Tools</button>
+                            </a>
+                            <a href="/close-service/<%= team.SupervisorPersonNumber%>">
+                                <button>Close Service</button>
+                            </a>
+                            <form action="/delete-team" method="POST" style="display:inline;">
+                                <input type="hidden" name="teamID" value="<%= team.SupervisorPersonNumber %>">
+                                <button type="submit" class="delete-team">Delete Team</button>
+                            </form>
+                            <!-- New Buttons for Lending and Returning Tools -->
+
+                        </td>
+                    <% } %>
+                </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    <% } else { %>
+        <p class="no-active-teams">NO ACTIVE TEAMS</p>
+    <% } %>
+    
+</body>
+</html>

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    .container {
+      margin-top: 20px;
+    }
+    .card {
+      margin-bottom: 20px;
+    }
+    .table thead th {
+      background-color: #f8f9fa;
+    }
+    .scroll-box {
+      max-height: 300px;
+      overflow-y: auto;
+      overflow-x: auto;
+    }
+    .btn-primary {
+      margin-top: 10px;
+    }
+    .selected-tools {
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin-top: 20px;
+    }
+    .selected-tools table {
+      width: 100%;
+    }
+    .selected-tools table th, .selected-tools table td {
+      text-align: center;
+    }
+    #searchInput {
+      width: 200px;
+    }
+    .submit-button-container {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .table {
+      table-layout: fixed;
+      width: 100%;
+    }
+    .table td, .table th {
+      word-wrap: break-word;
+    }
+    .error-message {
+      color: red;
+      margin-top: 10px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1><%= title %></h1>
+
+    <!-- Display remaining tools limit -->
+    <b class="card-text">Remaining tools limit for the team:(Out of 20)<strong><%= remainingLimit %></strong></b>
+    <br><br>
+
+    <!-- Tool Selection Form -->
+    <form id="toolForm" method="POST" action="/lend-tools" onsubmit="return validateForm()">
+      
+      <!-- Hidden Inputs for Additional Data -->
+      <b>Chopper:</b>
+      <input name="frameNumber" value="<%= frameNumber %>" readonly>
+      <br><br>
+      <b>Supervisor Person Number:</b>
+      <input name="supervisor" value="<%= supervisor %>" readonly>
+
+      <!-- Select Employee -->
+      <div class="form-group">
+        <label for="employeeSelect">Select Employee:</label>
+        <select id="employeeSelect" name="EmployeeID" class="form-control">
+          <option value="">-- Select Employee --</option>
+          <% employees.forEach(employee => { %>
+            <option value="<%= employee.PersonNumber %>"><%= employee.Name %></option>
+          <% }); %>
+        </select>
+      </div>
+
+      <!-- Select Service -->
+      <div class="form-group">
+        <label for="serviceSelect">Select Service:</label>
+        <select id="serviceSelect" name="service" class="form-control">
+          <option value="">-- Select Service --</option>
+          <% services.forEach(service => { %>
+            <option value="<%= service.ServiceID %>"><%= service.Name %></option>
+          <% }); %>
+        </select>
+      </div>
+
+      <!-- Error Message -->
+      <p class="error-message" id="errorMessage"></p>
+      
+      <!-- Search Tools -->
+      <div class="form-group">
+        <label for="searchInput">Search Tools:</label>
+        <input id="searchInput" type="text" class="form-control" placeholder="Search tools">
+      </div>
+
+      <!-- Tool Lists Side by Side -->
+      <div class="row">
+        <!-- Available Tools -->
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header">
+              Available Tools
+            </div>
+            <div class="card-body">
+              <div class="scroll-box">
+                <table class="table table-bordered" id="toolsTable">
+                  <thead>
+                    <tr>
+                      <th>Toolkit Name</th>
+                      <th>Tool Name</th>
+                      <th>Color 1</th>
+                      <th>Color 2</th>
+                      <th>Qty Avl</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% tools.forEach(tool => { %>
+                      <tr data-tool-id="<%= tool.ToolID %>" data-tool-name="<%= tool.Name %>" data-color1="<%= tool.Color1 %>" data-color2="<%= tool.Color2 %>" data-qtyavailable="<%= tool.QtyAvailable %>">
+                        <td><%= tool.ToolkitName %></td>
+                        <td><%= tool.Name %></td>
+                        <td style="background-color: <%= tool.Color1 %>; color: <%= tool.Color1 %>"><%= tool.Color1 %></td>
+                        <td style="background-color: <%= tool.Color2 %>; color: <%= tool.Color2 %>"><%= tool.Color2 %></td>
+                        <td><%= tool.QtyAvailable %></td>
+                        <td>
+                          <button type="button" class="btn btn-primary add-btn">Add</button>
+                        </td>
+                      </tr>
+                    <% }); %>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Selected Tools -->
+        <div class="col-md-6">
+          <div class="card selected-tools">
+            <div class="card-header">
+              Selected Tools
+            </div>
+            <div class="card-body">
+              <table class="table table-bordered" id="selectedToolsTable">
+                <thead>
+                  <tr>
+                    <th>Toolkit Name</th>
+                    <th>Tool Name</th>
+                    <th>Color 1</th>
+                    <th>Color 2</th>
+                    <th>Qty</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="selectedToolsList">
+                  <!-- Dynamically added tools will appear here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="submit-button-container">
+        <button type="submit" class="btn btn-success">Submit</button>
+      </div>
+    </form>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      var maxToolsPerTeam = <%= maxToolsPerTeam %>;
+
+      // Search functionality for tools
+      $('#searchInput').on('keyup', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault(); // Prevent form submission
+        }
+        var value = $(this).val().toLowerCase();
+        $('#toolsTable tbody tr').filter(function() {
+          $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+        });
+      });
+  // Add tool to selected list
+      $('.add-btn').on('click', function() {
+        var row = $(this).closest('tr');
+        var toolID = row.data('tool-id');
+        var toolkitName = row.children('td').eq(0).text();
+        var toolName = row.children('td').eq(1).text();
+        var color1 = row.data('color1');
+        var color2 = row.data('color2');
+        var qtyAvailable = row.data('qtyavailable');
+        var selectedQty = 1;
+
+        // Check if the max tools limit has been reached
+        if ($('#selectedToolsList tr').length >= limit) {
+          alert('You cannot add more than ' + maxToolsPerTeam + ' tools.');
+          return;
+        }
+
+        var listItem = 
+          `<tr data-tool-id="${toolID}">
+            <td>${toolkitName}</td>
+            <td>${toolName}</td>
+            <td style="background-color: ${color1}; color: ${color1}">${color1}</td>
+            <td style="background-color: ${color2}; color: ${color2}">${color2}</td>
+            <td>${selectedQty}</td>
+            <td>
+              <button class="btn btn-danger btn-sm remove-btn" data-tool-id="${toolID}">Remove</button>
+            </td>
+          </tr>`;
+        $('#selectedToolsList').append(listItem);
+        $(this).prop('disabled', true); // Disable button after adding
+        updateRemainingTools();
+      });
+
+      // Remove tool from selected list
+      $('#selectedToolsList').on('click', '.remove-btn', function() {
+        var toolID = $(this).data('tool-id');
+        $(this).closest('tr').remove();
+        // Re-enable the corresponding Add button in the available tools list
+        $('#toolsTable tbody tr[data-tool-id="' + toolID + '"]').find('.add-btn').prop('disabled', false);
+        updateRemainingTools();
+      });
+
+      // Update remaining tools count
+      var limit = <%= remainingLimit %>;
+      function updateRemainingTools() {
+        var remainingLimit = limit - $('#selectedToolsList tr').length;
+        $('.card-text').html('Remaining tools limit for the team:(Out of 20) <strong>' + remainingLimit +  '</strong>');
+      }
+
+      // Add hidden inputs on form submit
+      $('#toolForm').on('submit', function() {
+        $('#toolForm').find('input[name="selectedTools[]"]').remove(); // Remove any existing hidden inputs
+        $('#selectedToolsList tr').each(function() {
+          var toolID = $(this).data('tool-id');
+          $('<input>').attr({
+            type: 'hidden',
+            name: 'selectedTools[]',
+            value: toolID
+          }).appendTo('#toolForm');
+        });
+      });
+
+      // Validate form before submitting
+      function validateForm() {
+    console.log('Validating form...'); // Debugging log
+
+    var employeeSelect = document.getElementById('employeeSelect');
+    var serviceSelect = document.getElementById('serviceSelect');
+    var selectedToolsList = document.getElementById('selectedToolsList');
+    var errorMessage = document.getElementById('errorMessage');
+
+    if (employeeSelect.value === "") {
+        errorMessage.innerText = 'Please select an employee.';
+        errorMessage.style.display = 'block'; // Ensure the message is shown
+        return false;
+    }
+
+    if (serviceSelect.value === "") {
+        errorMessage.innerText = 'Please select a service.';
+        errorMessage.style.display = 'block'; // Ensure the message is shown
+        return false;
+    }
+
+    if (selectedToolsList.children.length === 0) {
+        errorMessage.innerText = 'Please select at least one tool.';
+        errorMessage.style.display = 'block'; // Ensure the message is shown
+        return false;
+    }
+
+}
+
+    });
+    
+  </script>
+</body>
+</html>

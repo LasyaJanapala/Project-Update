@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        h1 {
+            background-color: #003366;
+            color: white;
+            padding: 20px;
+            margin: 0;
+            text-align: center;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .form-section,
+        .selected-details {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-section {
+            margin-right: 20px;
+        }
+
+        .selected-details {
+            margin-left: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        select,
+        input[type="checkbox"] {
+            margin-bottom: 15px;
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        input[type="checkbox"] {
+            width: auto;
+            margin-right: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .no-available {
+            color: #888;
+            font-style: italic;
+        }
+
+        .selected-details p {
+            margin: 10px 0;
+        }
+
+        .selected-details h3 {
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+    </style>
+    <script>
+        function updateSelected() {
+            const helicopter = document.getElementById('helicopter').value;
+            const supervisor = document.getElementById('supervisor').value;
+            const tradesmen = Array.from(document.querySelectorAll('input[name="tradesmen"]:checked'));
+
+            // Check if more than three tradesmen are selected
+            if (tradesmen.length > 3) {
+                alert('You can only select up to three tradesmen.');
+                // Deselect the last selected tradesman
+                tradesmen[3].checked = false;
+                return;
+            }
+
+            document.getElementById('selected-helicopter').innerText = helicopter || 'None';
+            document.getElementById('selected-supervisor').innerText = supervisor || 'None';
+            document.getElementById('selected-tradesmen').innerText = tradesmen.length > 0 ? tradesmen.map(el => el.nextElementSibling.innerText).join(', ') : 'None';
+        }
+    </script>
+</head>
+<body>
+    <h1><%= title %></h1>
+
+    <div class="container">
+        <!-- Form Section -->
+        <div class="form-section">
+            <form action="/assign-team" method="POST">
+                <a href="/manage-team">
+                    <button type="button">Back</button>
+                </a>
+                <div class="text-right">
+                    <button type="submit">Assign Team</button>
+                </div>
+
+                <label for="helicopter">Select Helicopter:</label>
+                <select id="helicopter" name="helicopter" onchange="updateSelected()">
+                    <option value="">Select Helicopter</option>
+                    <% if (helicopters && helicopters.length > 0) { %>
+                        <% helicopters.forEach(heli => { %>
+                            <option value="<%= heli.FrameNumber %>"><%= heli.FrameNumber %></option>
+                        <% }); %>
+                    <% } else { %>
+                        <option value="" disabled>No Helicopters Available</option>
+                    <% } %>
+                </select>
+
+                <label for="supervisor">Select Supervisor:</label>
+                <select id="supervisor" name="supervisor" onchange="updateSelected()">
+                    <option value="">Select Supervisor</option>
+                    <% if (supervisors && supervisors.length > 0) { %>
+                        <% supervisors.forEach(sup => { %>
+                            <option value="<%= sup.PersonNumber %>"><%= sup.Name %></option>
+                        <% }); %>
+                    <% } else { %>
+                        <option value="" disabled>No Supervisors Available</option>
+                    <% } %>
+                </select>
+
+                <label>Select Tradesmen:</label>
+                <% if (tradesmen && tradesmen.length > 0) { %>
+                    <% tradesmen.forEach(tradesman => { %>
+                        <div>
+                            <input type="checkbox" id="tradesman_<%= tradesman.PersonNumber %>" name="tradesmen" value="<%= tradesman.PersonNumber %>" onchange="updateSelected()">
+                            <label for="tradesman_<%= tradesman.PersonNumber %>"><%= tradesman.Name %></label>
+                        </div>
+                    <% }); %>
+                <% } else { %>
+                    <p class="no-available">No Tradesmen Available</p>
+                <% } %>
+            </form>
+        </div>
+
+        <!-- Selected Details Section -->
+        <div class="selected-details">
+            <h3>Selected Details:</h3>
+            <p><strong>Helicopter:</strong> <span id="selected-helicopter">None</span></p>
+            <p><strong>Supervisor:</strong> <span id="selected-supervisor">None</span></p>
+            <p><strong>Tradesmen:</strong> <span id="selected-tradesmen">None</span></p>
+        </div>
+    </div>
+
+</body>
+</html>

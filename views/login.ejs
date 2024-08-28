@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #dcdcdc;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden; /* Prevent scrollbars */
+            width: 100%;
+        }
+
+        .left-section {
+            background-color: #18487A;
+            width: 50%; /* Adjust width to handle half-circle */
+            height: 150%; /* Make height larger to push half of the circle off-screen */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border-top-right-radius: 100%; /* Create half-circle effect */
+            border-bottom-right-radius: 100%;
+            transform: translateX(-25%); /* Shift left section to the left */
+            box-sizing: border-box;
+        }
+
+        .left-section img {
+            width: 200px; /* Size of the logo in the circle */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .right-section {
+            background-color: #dcdcdc;
+            width: 50%; /* Adjust width to handle half-circle */
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 50px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            font-size: 30px;
+            margin-bottom: 40px; /* Adjusted margin to balance space */
+            text-align: center;
+        }
+
+        .alert {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #f5c6cb;
+            background-color: #f8d7da;
+            color: #721c24;
+            border-radius: 5px;
+        }
+
+        form {
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px; /* Adjusted space between input fields */
+            text-align: center;
+        }
+
+        label {
+            font-size: 18px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        input[type="text"], input[type="password"] {
+            width: 70%;
+            padding: 10px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            display: block;
+            margin: 0 auto;
+        }
+
+        button {
+            padding: 15px 40px;
+            font-size: 16px;
+            background-color: #18487A;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px; /* Add margin above the button */
+        }
+
+        button:hover {
+            background-color: #3e6fa6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="left-section">
+            <img src="Images/CompanyLogo.jpg" alt="Company Logo">
+        </div>
+        <div class="right-section">
+            <h1><%= title %></h1>
+            <% if (message) { %>
+                <div class="alert">
+                    <%= message %>
+                </div>
+            <% } %>
+            <form action="/login" method="post">
+                <div class="form-group">
+                    <label for="personNumber">Person Number:</label>
+                    <input type="text" id="personNumber" name="personNumber" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit">Login</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

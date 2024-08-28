@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Assign Services</title>
+    <style>
+        /* General Styling */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        /* Container for layout */
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .services-list,
+        .selected-services-list {
+            width: 100%;
+            max-width: 600px;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .services-list {
+            border: 1px solid #ddd;
+        }
+
+        .selected-services-list {
+            border: 1px solid #ddd;
+        }
+
+        /* Styling for form elements */
+        label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        input[type="checkbox"] {
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Styling for list items */
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        ul li {
+            background-color: #e9ecef;
+            margin-bottom: 8px;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .services-list,
+            .selected-services-list {
+                max-width: 100%;
+            }
+        }
+    </style>
+    <script>
+        function updateSelectedServices() {
+            const selectedCheckboxes = document.querySelectorAll('input[name="services"]:checked');
+            const selectedServicesList = document.getElementById('selected-services');
+
+            selectedServicesList.innerHTML = '';
+            selectedCheckboxes.forEach(checkbox => {
+                const li = document.createElement('li');
+                li.textContent = checkbox.dataset.name;
+                selectedServicesList.appendChild(li);
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>Assign Services to Team: <%= team.SupervisorPersonNumber %></h1>
+    <h2>Helicopter : <%= team.HelicopterFrameNumber %></h2>
+
+    <form action="/assign-service/<%= team.SupervisorPersonNumber %>" method="post">
+        <div class="container">
+            <div class="services-list">
+                <h3>Select Services:</h3>
+                <% services.forEach(service => { %>
+                    <label>
+                        <input type="checkbox" name="services" value="<%= service.ServiceID %>" data-name="<%= service.Name %>" onchange="updateSelectedServices()">
+                        <%= service.Name %>
+                    </label>
+                <% }); %>
+            </div>
+
+            <div class="selected-services-list">
+                <h3>Selected Services:</h3>
+                <ul id="selected-services">
+                    <!-- Dynamically populated list -->
+                </ul>
+            </div>
+        </div>
+
+        <button type="submit">Assign Services</button>
+    </form>
+</body>
+</html>
